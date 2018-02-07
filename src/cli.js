@@ -155,7 +155,7 @@ async function logData(process, processData) {
 
 function doScrape({ id, url, date }) {
   //console.log(id, url, date);
-  return Math.random() >= 0.5;
+  return true;
 }
 
 try {
