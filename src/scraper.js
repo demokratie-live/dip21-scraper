@@ -436,7 +436,7 @@ class Scraper {
         id: vorgangId.split('-')[1],
         url: `/dip21.web/searchProcedures/simple_search_list.do?selId=${
           vorgangId.split('-')[1]
-        }&method=select&offset=0&anzahl=200&sort=3&direction=desc`,
+        }&method=select&offset=0&anzahl=${this.options.resultsPerPage}&sort=3&direction=desc`,
         scraped: false,
       });
       return;
@@ -455,7 +455,6 @@ class Scraper {
           const { formMethod: newFormMethod, formAction: newFormAction } = searchFormData;
           newFormData = { ...formData, ...newFormData };
           newFormData.method = '>'; // Next page can only be reached through this
-          newFormData.offset = (i - 1) * this.options.resultsPerPage;
           const { body: tmpBody } = await browser.browser.getSearchResultPage({
             formMethod: newFormMethod,
             formAction: `http://dipbt.bundestag.de${newFormAction}`,
