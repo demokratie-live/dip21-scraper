@@ -11,14 +11,30 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          path: scraper
+      - uses: actions/checkout@v2
+        with:
+          path: dip21-data
+          repository: bundestag/dip21-daten
+
       - name: Use Node.js 12
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
 
       - run: yarn install
+        working-directory: scraper
 
       - name: Scrape Data
         run: yarn dev --html -s 10 --periods 19 --operationtypes 100
+        working-directory: scraper
         env:
           SCRAPER_USER_AGEND: UpdateGithubData-(github.com/bundestag/dip21-daten)
+
+      - name: remove old Data
+        run: rm -rf 19/Gesetzgebung
+        working-directory: dip21-data
+
+      - name: copy files
+        run: cp scraper/files/19/Gesetzgebung dip21-data/19/Gesetzgebung
