@@ -6,6 +6,7 @@ const program = require('commander');
 const inquirer = require('inquirer');
 const jsonfile = require('jsonfile');
 const fs = require('fs-extra');
+const readline = require('readline');
 
 const _ = require('lodash');
 const prettyMs = require('pretty-ms');
@@ -89,8 +90,8 @@ const logFinished = async () => {
 };
 
 const logUpdateSearchProgress = async ({ search }) => {
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0);
   process.stdout.write(`Instances: ${search.instances.completed}/${search.instances.sum} (${_.toInteger(search.instances.completed / search.instances.sum * 100)}%) | Pages: ${search.pages.completed}/${search.pages.sum} (${_.toInteger(search.pages.completed / search.pages.sum * 100)}%)`);
 };
 
@@ -109,8 +110,8 @@ function getColor(value) {
 }
 
 const logUpdateDataProgress = async ({ value, browsers }) => {
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0);
   process.stdout.write(`Links: ${_.toInteger(value / linksSum * 100)}% | ${value}/${linksSum} | ${chalk.hsl(
     getColor(1 - value / linksSum),
     100,
