@@ -27,6 +27,7 @@ program
   )
   .option('-u, --url [value]', 'Base url of dip21', 'dip21.bundestag.de')
   .option('-s, --stacksize <Integer>', 'size of paralell browsers', 1)
+  .option('-o, --out [value]', 'size of paralell browsers', 'files')
   .option('-q, --quiet', 'Silent Mode - No Outputs')
   .option('--html', 'scrape html version', 'html')
   .option('--importantState [value]', 'states to scrape from live', appender(), '')
@@ -128,7 +129,7 @@ const logUpdateDataProgress = async ({ value, browsers }) => {
 
 const outScraperData = async ({ procedureId, procedureData }) => {
   if (procedureData) {
-    const directory = `files/${procedureData.VORGANG.WAHLPERIODE}/${
+    const directory = `${program.out}/${procedureData.VORGANG.WAHLPERIODE}/${
       procedureData.VORGANG.VORGANGSTYP
     }`;
     await fs.ensureDir(directory);
