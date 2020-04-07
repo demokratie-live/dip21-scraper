@@ -150,7 +150,7 @@ process.on('SIGINT', async () => {
 
 const logError = ({ error }) => {
   process.stdout.write('\n');
-  console.log(error);
+  console.log('logError:', error);
 };
 
 scraper

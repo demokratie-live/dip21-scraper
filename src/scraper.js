@@ -100,7 +100,7 @@ class Scraper {
             this.stack[0] = newBrowser;
           })
           .catch(async (error2) => {
-            this.options.logError({ error2 });
+            this.options.logError({ error: error2 });
           });
       }
     }
@@ -293,7 +293,7 @@ class Scraper {
                   this.stack[browserIndex] = newBrowser;
                 })
                 .catch(async (error2) => {
-                  this.options.logError({ error2 });
+                  this.options.logError({ error: error2 });
                 });
             }
           });
