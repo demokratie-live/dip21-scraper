@@ -71,7 +71,7 @@ class DipBrowser {
     let operationTypes = this.getSelectOptions({
       selectHtml: operationTypesMatches[0],
     });
-    operationTypes = operationTypes.map(e => ({
+    operationTypes = operationTypes.map((e) => ({
       ...e,
       number: e.name.split(' - ')[0],
     }));
@@ -82,7 +82,9 @@ class DipBrowser {
   };
 
   getBeratungsablaeufeSearchFormData = async ({ body }) => {
-    const form = body.match(/<form.*?id="ProceduresSimpleSearchForm".*?method="(.*?)?".*?action="(.*?)?".*?>(.|[\r\n])*?<\/form>/);
+    const form = body.match(
+      /<form.*?id="ProceduresSimpleSearchForm".*?method="(.*?)?".*?action="(.*?)?".*?>(.|[\r\n])*?<\/form>/,
+    );
     const method = form[1];
     const action = form[2];
 

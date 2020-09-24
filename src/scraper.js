@@ -20,9 +20,7 @@ class Scraper {
     }
     this.baseUrl = props.baseUrl;
     this.urls = {
-      processRunning: `https://${
-        this.baseUrl
-      }/dip21.web/searchProcedures/simple_search_detail_vp.do?vorgangId=`,
+      processRunning: `https://${this.baseUrl}/dip21.web/searchProcedures/simple_search_detail_vp.do?vorgangId=`,
       search: `https://${this.baseUrl}/dip21.web/searchProcedures.do;jsessionid=`,
       dipUrl: `https://${this.baseUrl}`,
       startUrl: '/dip21.web/bt',
@@ -77,9 +75,11 @@ class Scraper {
     let stackCreated = false;
     while (!stackCreated) {
       try {
-        this.stack = await Promise.all(this.createBrowserStack({
-          size: Math.max(browserStackSize, 1),
-        }));
+        this.stack = await Promise.all(
+          this.createBrowserStack({
+            size: Math.max(browserStackSize, 1),
+          }),
+        );
         stackCreated = true;
       } catch (error) {
         console.log('bundestag down (stack)');
@@ -117,9 +117,11 @@ class Scraper {
     });
     this.options.logStopSearchProgress();
 
-    await Promise.all(this.stack.map(async (browser, browserIndex) => {
-      await this.startAnalyse(browserIndex);
-    })).then(async () => {
+    await Promise.all(
+      this.stack.map(async (browser, browserIndex) => {
+        await this.startAnalyse(browserIndex);
+      }),
+    ).then(async () => {
       this.options.logUpdateDataProgress({
         value: this.completedLinks,
         retries: this.retries,
@@ -143,7 +145,7 @@ class Scraper {
       periods.forEach((period) => {
         this.filters = [
           ...this.filters,
-          ...operationTypes.map(operationType => ({ period, operationType, scraped: false })),
+          ...operationTypes.map((operationType) => ({ period, operationType, scraped: false })),
         ];
       });
     } else {
@@ -154,8 +156,11 @@ class Scraper {
 
     this.status.search.instances.sum = this.filters.length;
 
-    await Promise.all(this.stack.map((browser, browserIndex) =>
-      this.getProceduresFromSearch({ browser, browserIndex })));
+    await Promise.all(
+      this.stack.map((browser, browserIndex) =>
+        this.getProceduresFromSearch({ browser, browserIndex }),
+      ),
+    );
     this.procedures = _.uniqBy(this.procedures, 'id');
   };
 
@@ -189,7 +194,7 @@ class Scraper {
           });
           const linkExp = new RegExp(
             `<td>(?:${this.filters[filterIndex].operationTypes
-              .map(o => this.encodedStr(o))
+              .map((o) => this.encodedStr(o))
               .join('|')})</td>.*?href="(.*?)"`,
             'gm',
           );
@@ -201,9 +206,7 @@ class Scraper {
               const id = linkPart.match(/\/(\d+).html/);
               return {
                 id: id[1],
-                url: `https://dipbt.bundestag.de/extrakt/ba/WP${
-                  this.filters[filterIndex].period
-                }/${linkPart}`,
+                url: `https://dipbt.bundestag.de/extrakt/ba/WP${this.filters[filterIndex].period}/${linkPart}`,
                 scraped: false,
               };
             }),
@@ -347,8 +350,10 @@ class Scraper {
     } else if (_.isFunction(this.options.selectPeriods)) {
       selectedPeriods = await this.options.selectPeriods({ periods });
     } else {
-      throw new Error(`Period must be type of "Array" or "function" witch return an array!\nYou give "${typeof this
-        .options.selectPeriods}"`);
+      throw new Error(
+        `Period must be type of "Array" or "function" witch return an array!\nYou give "${typeof this
+          .options.selectPeriods}"`,
+      );
     }
     if (selectedPeriods.includes('Alle') || selectedPeriods.length === 0) {
       selectedPeriods = periods.filter(({ name }) => name !== 'Alle').map(({ name }) => name);
@@ -361,8 +366,10 @@ class Scraper {
     } else if (_.isFunction(this.options.selectOperationTypes)) {
       selectedOperationTypes = await this.options.selectOperationTypes({ operationTypes });
     } else {
-      throw new Error(`Period must be type of "Array" or "function" witch return an array!\nYou give "${typeof this
-        .options.selectOperationTypes}"`);
+      throw new Error(
+        `Period must be type of "Array" or "function" witch return an array!\nYou give "${typeof this
+          .options.selectOperationTypes}"`,
+      );
     }
     if (selectedOperationTypes.includes('Alle') || selectedOperationTypes.length === 0) {
       selectedOperationTypes = operationTypes
@@ -372,19 +379,22 @@ class Scraper {
 
     if (this.options.scrapeType !== 'html') {
       return {
-        periods: selectedPeriods.map(p => periods.find(({ name }) => name === p).value),
-        operationTypes: selectedOperationTypes.map(n => operationTypes.find(({ number }) => number === n).value),
+        periods: selectedPeriods.map((p) => periods.find(({ name }) => name === p).value),
+        operationTypes: selectedOperationTypes.map(
+          (n) => operationTypes.find(({ number }) => number === n).value,
+        ),
       };
     }
     return {
-      periods: selectedPeriods.map(p => periods.find(({ name }) => name === p).name),
-      operationTypes: selectedOperationTypes.map(n =>
-        operationTypes.find(({ number }) => number === n).name.replace(`${n} - `, '')),
+      periods: selectedPeriods.map((p) => periods.find(({ name }) => name === p).name),
+      operationTypes: selectedOperationTypes.map((n) =>
+        operationTypes.find(({ number }) => number === n).name.replace(`${n} - `, ''),
+      ),
     };
   };
 
   async selectPeriod({ browser, periodName }) {
-    const period = this.availableFilters.periods.find(p => p.name === periodName);
+    const period = this.availableFilters.periods.find((p) => p.name === periodName);
     await Promise.all([
       browser.page.waitForNavigation({ waitUntil: ['domcontentloaded'] }),
       browser.page.select('select#wahlperiode', period.value),
@@ -398,7 +408,9 @@ class Scraper {
   }
 
   async selectOperationTypes({ browser, operationTypeNumber }) {
-    const operationType = this.availableFilters.operationTypes.find(o => o.number === operationTypeNumber);
+    const operationType = this.availableFilters.operationTypes.find(
+      (o) => o.number === operationTypeNumber,
+    );
     if (!operationType) {
       throw new Error(`OperationType "${operationTypeNumber}" not found`);
     }
@@ -421,9 +433,7 @@ class Scraper {
     };
   };
 
-  startSearch = async ({
-    browser, formData, formMethod, formAction,
-  }) => {
+  startSearch = async ({ browser, formData, formMethod, formAction }) => {
     const { body: searchResultBody } = await browser.browser.getSearchResultPage({
       formMethod,
       formAction,
@@ -470,7 +480,7 @@ class Scraper {
         }
 
         let pageLinks = browser.browser.getEntries({ body: searchResultBodyToAnalyse });
-        pageLinks = pageLinks.filter(link => this.options.doScrape({ data: link }));
+        pageLinks = pageLinks.filter((link) => this.options.doScrape({ data: link }));
         this.procedures.push(...pageLinks);
         this.status.search.pages.completed += 1;
         pagesCompleted += 1;
@@ -489,9 +499,7 @@ class Scraper {
     }
   };
 
-  async saveJson({
-    id, link, dipBrowser, scrapeVersion,
-  }) {
+  async saveJson({ id, link, dipBrowser, scrapeVersion }) {
     const procedureIdRegex = /\[ID:&nbsp;(.*?)\]/;
     const { body: entryBody } = await dipBrowser.request({
       uri: link,
@@ -513,7 +521,9 @@ class Scraper {
       vorgangId = queryObj.selId || id;
     }
     if (procedureId.split('-')[1] !== vorgangId) {
-      const error = new Error(`Procedure ID missmatch URL: "${vorgangId}" to HTML: "${procedureId.split('-')[1]}"`);
+      const error = new Error(
+        `Procedure ID missmatch URL: "${vorgangId}" to HTML: "${procedureId.split('-')[1]}"`,
+      );
       throw {
         error,
         code: 1013,
@@ -542,9 +552,13 @@ class Scraper {
       delete dataProcedure.VORGANG.VORGANGSABLAUF;
 
       if (
-        this.options.liveScrapeStates.find(state => dataProcedure.VORGANG.AKTUELLER_STAND === state)
+        this.options.liveScrapeStates.find(
+          (state) => dataProcedure.VORGANG.AKTUELLER_STAND === state,
+        )
       ) {
-        const dipLink = entryBody.match(/<a class="linkExtern" href="(.*?)"><strong>Weitere Details in DIP...<\/strong><\/a>/)[1];
+        const dipLink = entryBody.match(
+          /<a class="linkExtern" href="(.*?)"><strong>Weitere Details in DIP...<\/strong><\/a>/,
+        )[1];
         await this.saveJson({
           id,
           link: dipLink,
@@ -560,7 +574,11 @@ class Scraper {
       }
     }
     if (procedureData) {
-      this.options.outScraperData({ procedureId, procedureData });
+      try {
+        this.options.outScraperData({ procedureId, procedureData });
+      } catch (error) {
+        this.options.logError({ error });
+      }
     }
   }
 
