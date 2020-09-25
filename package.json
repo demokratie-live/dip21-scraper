@@ -27,6 +27,7 @@
     "lodash": "^4.17.5",
     "log": "^1.4.0",
     "node-gyp": "^3.6.2",
+    "p-iteration": "^1.1.8",
     "pretty-ms": "^3.1.0",
     "request": "^2.83.0",
     "request-cookies": "^1.1.0",

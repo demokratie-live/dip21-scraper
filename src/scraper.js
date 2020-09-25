@@ -1,3 +1,4 @@
+import { forEachSeries, mapSeries } from 'p-iteration';
 /* eslint-disable max-len */
 /* eslint-disable no-throw-literal */
 
@@ -100,7 +101,7 @@ class Scraper {
             this.stack[0] = newBrowser;
           })
           .catch(async (error2) => {
-            this.options.logError({ error: error2 });
+            this.options.logError(error2);
           });
       }
     }
@@ -117,11 +118,9 @@ class Scraper {
     });
     this.options.logStopSearchProgress();
 
-    await Promise.all(
-      this.stack.map(async (browser, browserIndex) => {
-        await this.startAnalyse(browserIndex);
-      }),
-    ).then(async () => {
+    await forEachSeries(this.stack, async (browser, browserIndex) => {
+      await this.startAnalyse(browserIndex);
+    }).then(async () => {
       this.options.logUpdateDataProgress({
         value: this.completedLinks,
         retries: this.retries,
@@ -217,7 +216,7 @@ class Scraper {
         this.options.logUpdateSearchProgress({ ...this.status, hasError });
       } catch (error) {
         hasError = true;
-        this.options.logError({ error });
+        this.options.logError(error);
         this.filters[filterIndex].scraped = false;
         this.stack[browserIndex].errors += 1;
         this.options.logUpdateSearchProgress({ ...this.status, hasError });
@@ -250,7 +249,7 @@ class Scraper {
             this.stack[browserIndex] = newBrowser;
           })
           .catch(async (error) => {
-            this.options.logError({ error });
+            this.options.logError(error);
           });
       } else {
         const linkIndex = this.procedures.findIndex(({ scraped }) => !scraped);
@@ -276,7 +275,7 @@ class Scraper {
             });
           })
           .catch(async (error) => {
-            this.options.logError({ error });
+            this.options.logError(error);
             this.procedures[linkIndex].scraped = false;
             this.stack[browserIndex].used = false;
             this.stack[browserIndex].errors += 1;
@@ -296,7 +295,7 @@ class Scraper {
                   this.stack[browserIndex] = newBrowser;
                 })
                 .catch(async (error2) => {
-                  this.options.logError({ error: error2 });
+                  this.options.logError(error2);
                 });
             }
           });
@@ -574,11 +573,9 @@ class Scraper {
       }
     }
     if (procedureData) {
-      try {
-        this.options.outScraperData({ procedureId, procedureData });
-      } catch (error) {
-        this.options.logError({ error });
-      }
+      await this.options.outScraperData({ procedureId, procedureData });
+    } else {
+      console.warn(`no procedureData for ${vorgangId}`);
     }
   }
 

@@ -55,10 +55,10 @@ const selectPeriods = async ({ periods }) => {
         }
         return undefined;
       })
-      .filter(v => v !== undefined);
+      .filter((v) => v !== undefined);
     return selectedPeriod;
   }
-  return selectedPeriod.split(',').filter(name => periods.find(period => period.name === name));
+  return selectedPeriod.split(',').filter((name) => periods.find((period) => period.name === name));
 };
 
 const selectOperationTypes = async ({ operationTypes }) => {
@@ -78,7 +78,7 @@ const selectOperationTypes = async ({ operationTypes }) => {
         }
         return undefined;
       })
-      .filter(v => v !== undefined);
+      .filter((v) => v !== undefined);
   } else {
     selectedOperationTypes = program.operationtypes.split(',');
   }
@@ -92,7 +92,13 @@ const logFinished = async () => {
 const logUpdateSearchProgress = async ({ search }) => {
   readline.clearLine(process.stdout, 0);
   readline.cursorTo(process.stdout, 0);
-  process.stdout.write(`Instances: ${search.instances.completed}/${search.instances.sum} (${_.toInteger(search.instances.completed / search.instances.sum * 100)}%) | Pages: ${search.pages.completed}/${search.pages.sum} (${_.toInteger(search.pages.completed / search.pages.sum * 100)}%)`);
+  process.stdout.write(
+    `Instances: ${search.instances.completed}/${search.instances.sum} (${_.toInteger(
+      (search.instances.completed / search.instances.sum) * 100,
+    )}%) | Pages: ${search.pages.completed}/${search.pages.sum} (${_.toInteger(
+      (search.pages.completed / search.pages.sum) * 100,
+    )}%)`,
+  );
 };
 
 let linksSum = 0;
@@ -112,27 +118,29 @@ function getColor(value) {
 const logUpdateDataProgress = async ({ value, browsers }) => {
   readline.clearLine(process.stdout, 0);
   readline.cursorTo(process.stdout, 0);
-  process.stdout.write(`Links: ${_.toInteger(value / linksSum * 100)}% | ${value}/${linksSum} | ${chalk.hsl(
-    getColor(1 - value / linksSum),
-    100,
-    50,
-  )(prettyMs(_.toInteger((new Date() - startDate) / value * (linksSum - value)), {
-    compact: true,
-  }))} | ${browsers.map(({ scraped }) => {
-    if (_.maxBy(browsers, 'scraped').scraped === scraped) {
-      return chalk.green(scraped);
-    } else if (_.minBy(browsers, 'scraped').scraped === scraped) {
-      return chalk.red(scraped);
-    }
-    return scraped;
-  })} | ${browsers.map(({ errors }) => chalk.hsl(getColor(errors / 4), 100, 50)(errors))}`);
+  process.stdout.write(
+    `Links: ${_.toInteger((value / linksSum) * 100)}% | ${value}/${linksSum} | ${chalk.hsl(
+      getColor(1 - value / linksSum),
+      100,
+      50,
+    )(
+      prettyMs(_.toInteger(((new Date() - startDate) / value) * (linksSum - value)), {
+        compact: true,
+      }),
+    )} | ${browsers.map(({ scraped }) => {
+      if (_.maxBy(browsers, 'scraped').scraped === scraped) {
+        return chalk.green(scraped);
+      } else if (_.minBy(browsers, 'scraped').scraped === scraped) {
+        return chalk.red(scraped);
+      }
+      return scraped;
+    })} | ${browsers.map(({ errors }) => chalk.hsl(getColor(errors / 4), 100, 50)(errors))}`,
+  );
 };
 
 const outScraperData = async ({ procedureId, procedureData }) => {
   if (procedureData) {
-    const directory = `${program.out}/${procedureData.VORGANG.WAHLPERIODE}/${
-      procedureData.VORGANG.VORGANGSTYP
-    }`;
+    const directory = `${program.out}/${procedureData.VORGANG.WAHLPERIODE}/${procedureData.VORGANG.VORGANGSTYP}`;
     await fs.ensureDir(directory);
     jsonfile.writeFile(
       `${directory}/${procedureId}.json`,
@@ -150,7 +158,7 @@ process.on('SIGINT', async () => {
   process.exit(1);
 });
 
-const logError = ({ error }) => {
+const logError = (error) => {
   process.stdout.write('\n');
   console.log('logError:', error);
 };
