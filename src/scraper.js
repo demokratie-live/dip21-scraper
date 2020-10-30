@@ -1,4 +1,4 @@
-import { forEachSeries, mapSeries } from 'p-iteration';
+import { forEachSeries } from 'p-iteration';
 /* eslint-disable max-len */
 /* eslint-disable no-throw-literal */
 
@@ -198,18 +198,26 @@ class Scraper {
             'gm',
           );
 
-          this.procedures = [
-            ...this.procedures,
-            ...htmlPeriodBody.match(linkExp).map((s) => {
+          const newProcedures = [
+            ...htmlPeriodBody.match(linkExp).reduce((prev, s) => {
               const linkPart = s.match(/href="(.*?)"/)[1];
               const id = linkPart.match(/\/(\d+).html/);
-              return {
-                id: id[1],
-                url: `https://dipbt.bundestag.de/extrakt/ba/WP${this.filters[filterIndex].period}/${linkPart}`,
-                scraped: false,
-              };
-            }),
+              if (id) {
+                return [
+                  ...prev,
+                  {
+                    id: id[1],
+                    url: `https://dipbt.bundestag.de/extrakt/ba/WP${this.filters[filterIndex].period}/${linkPart}`,
+                    scraped: false,
+                  },
+                ];
+              }
+              console.log('Error: Link to live version');
+              return prev;
+            }, []),
           ];
+
+          this.procedures = [...this.procedures, ...newProcedures];
         }
         this.status.search.instances.completed += 1;
         this.stack[browserIndex].errors = 0;
